@@ -68,15 +68,15 @@ options{
 
  Regards,
  Mithun Technologies,
- 9980923226''', cc: 'pravallikachdevops@gmail.com', from: '', replyTo: '', subject: 'BuildOver!!', to: 'pravallikachdevops@gmail.com'
+ 7777777777''', cc: 'pravallikachdevops@gmail.com', from: '', replyTo: '', subject: 'BuildOver!!', to: 'pravallikachdevops@gmail.com'
  }
  
  failure{
  mail bcc: 'pravallikachdevops@gmail.com', body: '''BuildOver!....
 
  Regards,
- Mithun Technologies,
- 9980923226''', cc: 'pravallikachdevops@gmail.com', from: '', replyTo: '', subject: 'BuildOver!!', to: 'pravallikachdevops@gmail.com'
+ pravallika,
+ 7777777777''', cc: 'pravallikachdevops@gmail.com', from: '', replyTo: '', subject: 'BuildOver!!', to: 'pravallikachdevops@gmail.com'
  }
  
  }
