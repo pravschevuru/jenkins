@@ -5,6 +5,12 @@ pipeline{
     }
     stages{
         stage("sonar qube analysis"){
+		agent any
+
+tools{
+gradle 'gradle7.3.2'
+
+}
             steps{
                 script{
                     withSonarQubeEnv(credentialsId: 'sonar_token') {
