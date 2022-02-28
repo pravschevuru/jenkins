@@ -7,7 +7,7 @@ node{
     stage("sonarqube code analysis"){
        sh "ls -lrth"
         withSonarQubeEnv(credentialsId: 'sonar_token') {
-        sh "${gradleHome}/bin/gradle sonarqube"
+        sh "${gradleHome}/bin/gradle build"
         
     }
 }
