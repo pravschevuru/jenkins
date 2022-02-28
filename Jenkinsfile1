@@ -6,7 +6,7 @@ node{
     
     stage("sonarqube code analysis"){
        sh "ls -lrth"
-        withSonarQubeEnv(credentialsId: 'sonar-token') {
+        withSonarQubeEnv(credentialsId: 'sonar_token') {
          sh 'chmod +x ${gradleHome}/bin/gradle'
         sh "${gradleHome}/bin/gradle sonarqube"
         
