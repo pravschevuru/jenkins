@@ -1,0 +1,217 @@
+apply plugin: 'installer-platform-plugin'
+apply plugin: 'installer-addon2-plugin'
+apply plugin: 'installer-platform-containerization-plugin'
+
+def pl = platform {
+    localProperties {
+        property 'recaptcha.publickey', ''
+        property 'recaptcha.privatekey', ''
+        property 'googleApiKey', ''
+        property 'csrf.allowed.url.patterns', '/[^/]+(/[^?]*)+(sop/response)$,/[^/]+(/[^?]*)+(merchant_callback)$,/[^/]+(/[^?]*)+(hop/response)$,/[^/]+(/[^?]*)+(language)$,/[^/]+(/[^?]*)+(currency)$,/(events)$'
+        property 'solr.config.Default.mode', 'standalone'
+        property 'solr.server.mode', 'standalone'
+        property 'solrserver.instances.default.autostart', 'false'
+        property 'solrserver.instances.default.mode', 'standalone'
+        property 'solrserver.instances.default.useMasterNodeExclusivelyForIndexing', 'true'	
+	property 'cluster.nodes.autodiscovery', 'true'	
+	property 'clustermode', 'true'
+	property 'cluster.broadcast.method.jgroups.configuration', 'jgroups-tcp-kubeping.xml'
+    }
+
+    afterSetup {
+        ensureAdminPasswordSet()
+    }
+
+    extensions {
+
+		/* Base Commerce extensions */
+        extName 'commerceservicesbackoffice'
+		extName 'platformbackoffice'
+				
+		/* Platform Extensions */		
+        extName 'solrfacetsearchbackoffice'
+        extName 'solrserver'
+		extName 'oauth2'
+
+        /* nvi custom extensions */
+        extName 'ambeststore'
+        extName 'avalaratax'
+        extName 'avsavalara'
+        extName 'egwstore'
+        extName 'esiservices'
+        extName 'eyedoctorsexam'
+        extName 'firstdata'
+        extName 'mostore'
+        extName 'nviaafesaddon'
+        extName 'nviasmorderserviceaddon'
+        extName 'nviblog'
+        extName 'nviblogaddon'
+        extName 'nvicockpits'
+        extName 'nvicommercewebservices'
+        extName 'nvicore'
+        extName 'nvicustomersupportbackoffice'
+        extName 'nvifacades'
+        extName 'nvifulfilmentprocess'
+        extName 'nviinitialdata'
+        extName 'nvipriceengine'
+        extName 'nvischeduleraddon'
+        extName 'nvischedulerclient'
+        extName 'nvisdsclient'
+        extName 'nviseoaddon'
+        extName 'nvisolrfacetsearch'
+        extName 'nvistorefront'
+        extName 'nvitest'
+        extName 'paypal'
+        extName 'paypaladdon'
+        extName 'seocore'
+        extName 'socialintegrationaddon'
+        extName 'starcard'
+
+
+        /* Assisted Service Module Extensions */
+        extName 'assistedservicestorefront'
+
+        /* Customer Service Module Extensions */
+        extName 'customersupportbackoffice'
+
+
+        /* WCMS & SmartEDIT extensions */
+        extName 'cmswebservices'
+        extName 'smarteditwebservices'
+        extName 'smarteditaddon'
+        extName 'cmssmartedit'
+        extName 'cmsbackoffice'
+		extName 'permissionswebservices'
+		extName 'previewwebservices'
+		extName 'previewpersonalizationweb'
+		
+        /* Promotions and rule builder */
+        extName 'rulebuilderbackoffice'
+		extName 'couponbackoffice'
+		extName 'droolsruleengineservices'
+		extName 'promotionenginesamplesaddon'
+				
+		extName 'couponfacades'
+		extName 'warehousingfacades'
+		extName 'wishlist'
+		
+		/* Addons */
+		extName 'acceleratorwebservicesaddon'
+		extName 'customerticketingaddon'
+		extName 'textfieldconfiguratortemplateaddon'
+		extName 'eventtrackingwsaddon'
+		extName 'hybrisanalyticsaddon'
+		extName 'captchaaddon'
+	
+    }
+	dbSetup {
+		dbType 'mysql'
+		dbDriver 'com.mysql.cj.jdbc.Driver'
+		dbUrl 'jdbc:mysql://10.72.240.3/hyvision?useConfigs=maxPerformance&characterEncoding=utf8&allowPublicKeyRetrieval=true&sslMode=DISABLED'
+		dbUser 'hyvision'
+		dbPassword 'hyvision'
+		dbTablePrefix ''
+		dbDriverJar '/home/hyvision/mysql-connector-java-8.0.23.jar'
+	}
+
+    addons {
+        forStoreFronts('nvistorefront') {
+            names('assistedservicestorefront','socialintegrationaddon','paypaladdon','nviseoaddon','nvischeduleraddon','nviblogaddon','nviaafesaddon','nviasmorderserviceaddon','customerticketingaddon','textfieldconfiguratortemplateaddon','eventtrackingwsaddon','hybrisanalyticsaddon','promotionenginesamplesaddon','captchaaddon','smarteditaddon')
+            template 'yacceleratorstorefront'
+        }
+		
+		forStoreFronts('nvicommercewebservices') {
+            names 'acceleratorwebservicesaddon'
+            template 'ycommercewebservices'
+        }
+    }
+}
+
+task copyLicenseJar(type: Copy) {
+  from '/home/hyvision/hybrislicence.jar'
+  into '../../../hybris/config/licence'
+}
+
+task setup(dependsOn: copyLicenseJar) {
+    doLast {
+        pl.setup()
+    }
+}
+
+task buildSystem(dependsOn: setup) {
+    doLast {
+        pl.build()
+    }
+}
+
+task initialize(dependsOn: buildSystem) {
+    doLast {
+        pl.initialize()
+    }
+}
+
+task start {
+    doLast {
+        pl.start()
+    }
+}
+
+task startInBackground {
+    doLast {
+        pl.startInBackground()
+    }
+}
+
+task stopInBackground {
+    doLast {
+        pl.stopInBackground()
+    }
+}
+
+def dpl = deployment('hyVisionDeployment') {
+ 
+    platformImage('platform') {
+        basedOn pl
+          
+	/* aspect('onlyBackoffice') {
+            enabledWebApps 'backoffice'
+            
+	    localProperties {
+                property 'backoffice.webroot', '/backoffice'
+            }
+	} */
+      
+	/*        
+	aspect('onlyHac') {
+            enabledWebApps 'hac'
+             
+            localProperties {
+                /*property 'persistence.legacy.mode', 'true' */
+                /*property 'hac.webroot', '/hac' */
+           /* }   
+   	    }
+        */
+		
+	aspect('onlyStorefront') {
+            enabledWebApps 'nvistorefront'
+	
+		localProperties {
+                property 'nvistorefront.webroot', ''
+            }
+        }
+         
+        aspect('allWebApps') {
+            enableAllWebApps()
+        }
+        
+	}	
+ 
+/*        aspect('noneWebApps')  */
+	
+}   
+         
+task createImagesStructure {
+    doLast {
+        dpl.createImagesStructure()
+    }
+}
