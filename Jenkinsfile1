@@ -1,0 +1,15 @@
+node{
+    def gradleHome = tool name: "gradle7.3.2"
+    stage("check out SCM"){
+        git credentialsId: 'github_crede1', url: 'https://github.com/pravschevuru/jenkins.git'
+    }
+    
+    stage("sonarqube code analysis"){
+       sh "ls -lrth"
+        withSonarQubeEnv(credentialsId: 'sonar-token') {
+         sh 'chmod +x ${gradleHome}/bin/gradle'
+        sh "${gradleHome}/bin/gradle sonarqube"
+        
+    }
+}
+}
